@@ -1,0 +1,28 @@
+def send_files_to_channel(update: Update, context):
+    # Retrieve file information from the database
+    conn = sqlite3.connect('your_database.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT file_id, file_name FROM files")
+    files = cursor.fetchall()
+    conn.close()
+
+    # Specify the channel ID where you want to send the files
+    channel_id = '@your_channel_username'  # Replace with your channel username or chat ID
+
+    # Send each file to the channel
+    for file_id, file_name in files:
+        file_link = bot.get_file(file_id)
+        bot.send_document(chat_id=channel_id, document=InputFile(file_link.file_path),
+                          caption=f"File: {file_name}")
+
+def main():
+    updater = Updater(token='YOUR_BOT_TOKEN', use_context=True)
+    dp = updater.dispatcher
+
+    dp.add_handler(CommandHandler('sendfiles', send_files_to_channel))  # Add a command to trigger sending files
+
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
